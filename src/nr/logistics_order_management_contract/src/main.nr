@@ -2,7 +2,7 @@ use aztec::macros::aztec;
 pub mod test;
 
 #[aztec]
-pub contract Counter {
+pub contract LogisticsOrderManagement {
     // aztec library imports
     use aztec::{
         macros::{functions::{external, initializer, internal, view}, storage::storage},
