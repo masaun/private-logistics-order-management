@@ -7,7 +7,7 @@ pub contract LogisticsOrderManagement {
     use aztec::{
         macros::{functions::{external, initializer, internal, view}, storage::storage},
         protocol_types::address::AztecAddress,
-        state_vars::{PublicImmutable, PublicMutable},
+        state_vars::{PublicImmutable, PublicMutable, PrivateMutable, PrivateSet, Map}
     };
 
     // @param owner The address of the owner
@@ -15,7 +15,8 @@ pub contract LogisticsOrderManagement {
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
-        order_id: PublicMutable<u128, Context>
+        order_id: PublicMutable<u128, Context>,
+        order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>, /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -43,6 +44,9 @@ pub contract LogisticsOrderManagement {
 
         let msg_sender: Option<AztecAddress> = context.msg_sender();
         //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
+
+        let current_order_id: u128 = logistics_order_management.get_order_id();
+        storage.order_quantity.at(current_order_id).write(100);
     }
 
     /// @dev Retrieves the current order ID
