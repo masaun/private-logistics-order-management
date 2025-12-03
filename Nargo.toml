@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "src/nr/counter_contract",
+    "src/nr/logistics_order_management_contract",
 ]
 
 [benchmark]
-counter = "benchmarks/counter.benchmark.ts"
+logistics_order_management = "benchmarks/logistics_order_management.benchmark.ts"

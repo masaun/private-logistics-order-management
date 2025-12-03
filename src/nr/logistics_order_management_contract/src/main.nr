@@ -15,6 +15,7 @@ pub contract LogisticsOrderManagement {
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
+        order_id: PublicMutable<u128, Context>,
         counter: PublicMutable<u128, Context>,
     }
 
@@ -33,25 +34,25 @@ pub contract LogisticsOrderManagement {
         storage.owner.read()
     }
 
-    /// @dev Increments the counter
+    /// @dev - Creates a new order and increments the order ID
     #[external("private")]
-    fn increment() {
-        Counter::at(context.this_address()).increment_internal().enqueue(&mut context);
+    fn create_new_order() {
+        LogisticsOrderManagement::at(context.this_address()).order_internal().enqueue(&mut context);
     }
 
-    /// @dev Retrieves the counter value
-    /// @return The current counter value
+    /// @dev Retrieves the current order ID
+    /// @return The current order ID
     #[external("public")]
     #[view]
-    fn get_counter() -> u128 {
-        storage.counter.read()
+    fn get_order_id() -> u128 {
+        storage.order_id.read()
     }
 
-    /// @dev Increments the counter
-    #[external("public")]
+    /// @dev - Increments the order ID
+    #[external("private")]
     #[internal]
-    fn increment_internal() {
-        let current_value = storage.counter.read();
-        storage.counter.write(current_value + 1);
+    fn order_internal() {
+        let current_order_id = storage.order_id.read();
+        storage.order_id.write(current_order_id + 1);
     }
 }
