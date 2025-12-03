@@ -15,8 +15,7 @@ pub contract LogisticsOrderManagement {
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
-        order_id: PublicMutable<u128, Context>,
-        counter: PublicMutable<u128, Context>,
+        order_id: PublicMutable<u128, Context>
     }
 
     /// @dev Initialize the contract
@@ -37,7 +36,8 @@ pub contract LogisticsOrderManagement {
     /// @dev - Creates a new order and increments the order ID
     #[external("private")]
     fn create_new_order() {
-        LogisticsOrderManagement::at(context.this_address()).order_internal().enqueue(&mut context);
+        LogisticsOrderManagement::at(context.this_address()).order_internal();
+        //LogisticsOrderManagement::at(context.this_address()).order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
     }
 
     /// @dev Retrieves the current order ID
@@ -49,10 +49,10 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev - Increments the order ID
-    #[external("private")]
+    #[external("public")] // @dev - [NOTE]: .write()/.read() methods can be used in "public" functions.
     #[internal]
     fn order_internal() {
-        let current_order_id = storage.order_id.read();
+        let current_order_id: u128 = storage.order_id.read();
         storage.order_id.write(current_order_id + 1);
     }
 }

@@ -1,13 +1,13 @@
 use crate::{LogisticsOrderManagement, test::utils};
 
 #[test]
-unconstrained fn increment_success() {
+unconstrained fn new_order_creation_should_be_success() {
     let (env, contract_address, owner, _) = utils::setup_contract(false);
 
-    env.call_private(owner, LogisticsOrderManagement::at(contract_address).increment());
+    env.call_private(owner, LogisticsOrderManagement::at(contract_address).create_new_order());
 
-    let counter = env.view_public(LogisticsOrderManagement::at(contract_address).get_counter());
-    assert(counter == 1);
+    let order_id = env.view_public(LogisticsOrderManagement::at(contract_address).get_order_id());
+    assert(order_id == 1);
 }
 
 #[test]
@@ -21,7 +21,7 @@ unconstrained fn does_it_fail_to_call_the_initializer() {
     let contract_address =
         logistics_order_management_deployer.with_public_initializer(owner, initializer_call_interface);
 
-    env.call_private(owner, LogisticsOrderManagement::at(contract_address).increment());
-    let counter = env.view_public(LogisticsOrderManagement::at(contract_address).get_counter());
-    assert(counter == 1);
+    env.call_private(owner, LogisticsOrderManagement::at(contract_address).create_new_order());
+    let order_id = env.view_public(LogisticsOrderManagement::at(contract_address).get_order_id());
+    assert(order_id == 1);
 }
