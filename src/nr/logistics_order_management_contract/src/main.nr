@@ -36,8 +36,13 @@ pub contract LogisticsOrderManagement {
     /// @dev - Creates a new order and increments the order ID
     #[external("private")]
     fn create_new_order() {
-        LogisticsOrderManagement::at(context.this_address()).order_internal();
-        //LogisticsOrderManagement::at(context.this_address()).order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+        let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
+
+        logistics_order_management.order_internal();
+        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+
+        let msg_sender: Option<AztecAddress> = context.msg_sender();
+        //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
     }
 
     /// @dev Retrieves the current order ID
