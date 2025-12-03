@@ -45,9 +45,17 @@ pub contract LogisticsOrderManagement {
         let msg_sender: Option<AztecAddress> = context.msg_sender();
         //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
 
-        let current_order_id: u128 = logistics_order_management.get_order_id();
+        //let current_order_id: u128 = storage.order_id;
+        let current_order_id = logistics_order_management.get_order_id();
         storage.order_quantity.at(current_order_id).write(100);
+        //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
+
+    // #[external("private")]
+    // fn update_order_quantity_private(storage: Storage<PrivateContext>, order_id: u128, quantity: u128) {
+    //     storage.order_quantity.at(order_id).write(quantity);
+    // }
+
 
     /// @dev Retrieves the current order ID
     /// @return The current order ID
