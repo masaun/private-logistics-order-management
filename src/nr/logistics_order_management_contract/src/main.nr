@@ -16,7 +16,8 @@ pub contract LogisticsOrderManagement {
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
-        order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>, /// @dev - order_id -> order_quantity
+        order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,       /// @dev - order_id -> order_quantity
+        //order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>, /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -35,7 +36,7 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev - Creates a new order and increments the order ID
-    #[external("private")]
+    #[external("public")]
     fn create_new_order() {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
