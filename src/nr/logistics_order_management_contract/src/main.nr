@@ -7,7 +7,11 @@ pub contract LogisticsOrderManagement {
     use aztec::{
         macros::{functions::{external, initializer, internal, view}, storage::storage},
         protocol_types::address::AztecAddress,
-        state_vars::{PublicImmutable, PublicMutable, PrivateMutable, PrivateSet, Map}
+        state_vars::{
+            PublicImmutable, PublicMutable, 
+            PrivateImmutable, PrivateMutable, PrivateSet, 
+            Map
+        }
     };
 
     // @param owner The address of the owner
@@ -16,8 +20,8 @@ pub contract LogisticsOrderManagement {
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
-        order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,       /// @dev - order_id -> order_quantity
-        //order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>, /// @dev - order_id -> order_quantity
+        //order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,   /// @dev - order_id -> order_quantity
+        order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>,    /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -36,7 +40,7 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev - Creates a new order and increments the order ID
-    #[external("public")]
+    #[external("private")]
     fn create_new_order() {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
@@ -48,7 +52,7 @@ pub contract LogisticsOrderManagement {
 
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).write(100);
+        storage.order_quantity.at(current_order_id).replace(100);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
