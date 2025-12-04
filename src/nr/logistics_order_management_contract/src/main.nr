@@ -1,18 +1,53 @@
-use aztec::macros::aztec;
+//use aztec::macros::aztec;
+use dep::aztec::macros::aztec;
+
 pub mod test;
 
 #[aztec]
 pub contract LogisticsOrderManagement {
     // aztec library imports
     use aztec::{
-        macros::{functions::{external, initializer, internal, view}, storage::storage},
-        protocol_types::address::AztecAddress,
+        macros::{
+            functions::{external, initializer, internal, view}, 
+            storage::storage,
+            notes::{
+                note,
+                custom_note
+            },
+        },
+        protocol_types::{
+            address::AztecAddress,
+            traits::Packable
+        },
         state_vars::{
             PublicImmutable, PublicMutable, 
             PrivateImmutable, PrivateMutable, PrivateSet, 
             Map
-        }
+        },
+        oracle::random::random
     };
+
+
+
+
+    // @dev - The test Struct & its Note
+    #[derive(Eq, Packable)]
+    #[note]
+    pub struct CardNote {
+        points: u32,
+        strength: u32,
+        owner: AztecAddress,
+        randomness: Field,
+    }
+
+    impl CardNote {
+        pub fn new(points: u32, strength: u32, owner: AztecAddress) -> Self {
+            let randomness = unsafe { random() };
+            CardNote { points, strength, owner, randomness }
+        }
+    }
+
+
 
     // @param owner The address of the owner
     // @param counter A numerical value
@@ -52,7 +87,7 @@ pub contract LogisticsOrderManagement {
 
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(100);
+        storage.order_quantity.at(current_order_id).replace(100_u128);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
