@@ -35,6 +35,7 @@ pub contract LogisticsOrderManagement {
     //#[custom_note]
     pub struct PrivateOrderNote {
         owner: AztecAddress,
+        //order_id: u128,
         order_quantity: u128,
         randomness: Field,
     }
@@ -44,6 +45,7 @@ pub contract LogisticsOrderManagement {
             let randomness = unsafe { random() };
             PrivateOrderNote { 
                 owner,
+                //order_id: current_order_id,
                 order_quantity, 
                 randomness 
             }
@@ -58,8 +60,8 @@ pub contract LogisticsOrderManagement {
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
-        //order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,   /// @dev - order_id -> order_quantity
-        order_quantity: Map<AztecAddress, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
+        order_quantity: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
+        //order_quantity: Map<AztecAddress, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -78,8 +80,9 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev - Creates a new order and increments the order ID
+    /// @dev - [NOTE]: a given order_id is retrieved in FE + Stored from FE. (Because the order_id is a PublicMutable variable)
     #[external("private")]
-    fn create_new_order() {
+    fn create_new_order(order_id:u128) {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
         // @dev - Public function: The order_id is incremented internally.
@@ -95,7 +98,7 @@ pub contract LogisticsOrderManagement {
         //let current_order_id = logistics_order_management.get_order_id();
         
         // @dev - Store the order quantity associated with the caller's address (msg_sender)
-        storage.order_quantity.at(msg_sender).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+        storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
     }
 
     /// @dev Retrieves the current order ID
