@@ -23,9 +23,9 @@ pub contract LogisticsOrderManagement {
             PrivateImmutable, PrivateMutable, PrivateSet, 
             Map
         },
-        oracle::random::random
+        oracle::random::random,
+        messages::message_delivery::MessageDelivery
     };
-
 
 
 
@@ -85,7 +85,7 @@ pub contract LogisticsOrderManagement {
         logistics_order_management.order_internal();
         //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
 
-        let msg_sender: Option<AztecAddress> = context.msg_sender();
+        let msg_sender: Option<AztecAddress> = context.msg_sender().unwrap();
         //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
 
         let order_quantity: u32 = 100; // Initial order quantity is set to
@@ -93,7 +93,7 @@ pub contract LogisticsOrderManagement {
 
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(new_private_order_note);
+        storage.order_quantity.at(current_order_id).replace(new_private_order_note).emit(&mut context, MessageDelivery.CONSTRAINED_ONCHAIN);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
