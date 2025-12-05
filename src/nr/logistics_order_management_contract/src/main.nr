@@ -85,10 +85,6 @@ pub contract LogisticsOrderManagement {
     fn create_new_order(order_id:u128) {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
-        // @dev - Public function: The order_id is incremented internally.
-        logistics_order_management.order_internal();
-        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
-
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
         let order_quantity: u128 = 100; // Initial order quantity is set to
@@ -99,6 +95,10 @@ pub contract LogisticsOrderManagement {
         
         // @dev - Store the order quantity associated with the caller's address (msg_sender)
         storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+
+        // @dev - Public function: The order_id is incremented internally.
+        logistics_order_management.order_internal();
+        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
     }
 
     /// @dev Retrieves the current order ID
