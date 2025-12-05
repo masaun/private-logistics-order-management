@@ -35,12 +35,12 @@ pub contract LogisticsOrderManagement {
     //#[custom_note]
     pub struct PrivateOrderNote {
         owner: AztecAddress,
-        order_quantity: u32,
+        order_quantity: u128,
         randomness: Field,
     }
 
     impl PrivateOrderNote {
-        pub fn new(owner: AztecAddress, order_quantity: u32) -> Self {
+        pub fn new(owner: AztecAddress, order_quantity: u128) -> Self {
             let randomness = unsafe { random() };
             PrivateOrderNote { 
                 owner,
@@ -87,12 +87,12 @@ pub contract LogisticsOrderManagement {
 
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
-        let order_quantity: u32 = 100; // Initial order quantity is set to
+        let order_quantity: u128 = 100; // Initial order quantity is set to
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
 
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(|_old_private_order_note| new_private_order_note).emit(&mut context, MessageDelivery.CONSTRAINED_ONCHAIN);
+        storage.order_quantity.at(current_order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
