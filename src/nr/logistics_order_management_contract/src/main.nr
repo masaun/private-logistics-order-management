@@ -85,8 +85,7 @@ pub contract LogisticsOrderManagement {
         logistics_order_management.order_internal();
         //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
 
-        let msg_sender: Option<AztecAddress> = context.msg_sender().unwrap();
-        //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
+        let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
         let order_quantity: u32 = 100; // Initial order quantity is set to
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
