@@ -80,7 +80,7 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev - Creates a new order and increments the order ID
-    /// @dev - [NOTE]: a given order_id is retrieved in FE + Stored from FE. (Because the order_id is a PublicMutable variable)
+    /// @dev - [NOTE]: a given order_id is retrieved via the get_order_id() in FE + Stored from FE. (Because the order_id is a PublicMutable variable)
     #[external("private")]
     fn create_new_order(order_id:u128) {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
@@ -102,6 +102,7 @@ pub contract LogisticsOrderManagement {
     }
 
     /// @dev Retrieves the current order ID
+    /// @dev - This return value can be retrieved on FE - since the "order_id" is a PublicMutable variable.
     /// @return The current order ID
     #[external("public")]
     #[view]
