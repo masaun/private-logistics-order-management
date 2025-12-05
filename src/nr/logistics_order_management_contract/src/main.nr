@@ -1,4 +1,3 @@
-//use aztec::macros::aztec;
 use dep::aztec::macros::aztec;
 
 pub mod test;
@@ -33,17 +32,21 @@ pub contract LogisticsOrderManagement {
     // @dev - The test Struct & its Note
     #[derive(Eq, Packable)]
     #[note]
-    pub struct CardNote {
-        points: u32,
-        strength: u32,
+    //#[custom_note]
+    pub struct PrivateOrderNote {
         owner: AztecAddress,
+        order_quantity: u32,
         randomness: Field,
     }
 
-    impl CardNote {
-        pub fn new(points: u32, strength: u32, owner: AztecAddress) -> Self {
+    impl PrivateOrderNote {
+        pub fn new(owner: AztecAddress, order_quantity: u32) -> Self {
             let randomness = unsafe { random() };
-            CardNote { points, strength, owner, randomness }
+            PrivateOrderNote { 
+                owner,
+                order_quantity, 
+                randomness 
+            }
         }
     }
 
@@ -56,7 +59,7 @@ pub contract LogisticsOrderManagement {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
         //order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,   /// @dev - order_id -> order_quantity
-        order_quantity: Map<u128, PrivateMutable<u128, Context>, Context>,    /// @dev - order_id -> order_quantity
+        order_quantity: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -85,9 +88,12 @@ pub contract LogisticsOrderManagement {
         let msg_sender: Option<AztecAddress> = context.msg_sender();
         //assert!(msg_sender == storage.owner.read(), "Only owner can create new orders");
 
+        let order_quantity: u32 = 100; // Initial order quantity is set to
+        let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
+
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(100_u128);
+        storage.order_quantity.at(current_order_id).replace(new_private_order_note);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
