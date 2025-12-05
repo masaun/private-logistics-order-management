@@ -1,21 +1,65 @@
-use aztec::macros::aztec;
+use dep::aztec::macros::aztec;
+
 pub mod test;
 
 #[aztec]
 pub contract LogisticsOrderManagement {
     // aztec library imports
     use aztec::{
-        macros::{functions::{external, initializer, internal, view}, storage::storage},
-        protocol_types::address::AztecAddress,
-        state_vars::{PublicImmutable, PublicMutable},
+        macros::{
+            functions::{external, initializer, internal, view}, 
+            storage::storage,
+            notes::{
+                note,
+                custom_note
+            },
+        },
+        protocol_types::{
+            address::AztecAddress,
+            traits::Packable
+        },
+        state_vars::{
+            PublicImmutable, PublicMutable, 
+            PrivateImmutable, PrivateMutable, PrivateSet, 
+            Map
+        },
+        oracle::random::random,
+        messages::message_delivery::MessageDelivery
     };
+
+
+
+    // @dev - The test Struct & its Note
+    #[derive(Eq, Packable)]
+    #[note]
+    //#[custom_note]
+    pub struct PrivateOrderNote {
+        owner: AztecAddress,
+        order_quantity: u128,
+        randomness: Field,
+    }
+
+    impl PrivateOrderNote {
+        pub fn new(owner: AztecAddress, order_quantity: u128) -> Self {
+            let randomness = unsafe { random() };
+            PrivateOrderNote { 
+                owner,
+                order_quantity, 
+                randomness 
+            }
+        }
+    }
+
+
 
     // @param owner The address of the owner
     // @param counter A numerical value
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
-        order_id: PublicMutable<u128, Context>
+        order_id: PublicMutable<u128, Context>,
+        //order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,   /// @dev - order_id -> order_quantity
+        order_quantity: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -36,9 +80,27 @@ pub contract LogisticsOrderManagement {
     /// @dev - Creates a new order and increments the order ID
     #[external("private")]
     fn create_new_order() {
-        LogisticsOrderManagement::at(context.this_address()).order_internal();
-        //LogisticsOrderManagement::at(context.this_address()).order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+        let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
+
+        logistics_order_management.order_internal();
+        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+
+        let msg_sender: AztecAddress = context.msg_sender().unwrap();
+
+        let order_quantity: u128 = 100; // Initial order quantity is set to
+        let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
+
+        //let current_order_id: u128 = storage.order_id;
+        let current_order_id = logistics_order_management.get_order_id();
+        storage.order_quantity.at(current_order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
+        //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
+
+    // #[external("private")]
+    // fn update_order_quantity_private(storage: Storage<PrivateContext>, order_id: u128, quantity: u128) {
+    //     storage.order_quantity.at(order_id).write(quantity);
+    // }
+
 
     /// @dev Retrieves the current order ID
     /// @return The current order ID
