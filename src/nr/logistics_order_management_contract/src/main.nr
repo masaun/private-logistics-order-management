@@ -92,7 +92,7 @@ pub contract LogisticsOrderManagement {
 
         //let current_order_id: u128 = storage.order_id;
         let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(new_private_order_note).emit(&mut context, MessageDelivery.CONSTRAINED_ONCHAIN);
+        storage.order_quantity.at(current_order_id).replace(|_old_private_order_note| new_private_order_note).emit(&mut context, MessageDelivery.CONSTRAINED_ONCHAIN);
         //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
     }
 
