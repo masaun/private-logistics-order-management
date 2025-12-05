@@ -59,7 +59,7 @@ pub contract LogisticsOrderManagement {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
         //order_quantity: Map<u128, PublicMutable<u128, Context>, Context>,   /// @dev - order_id -> order_quantity
-        order_quantity: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
+        order_quantity: Map<AztecAddress, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
     }
 
     /// @dev Initialize the contract
@@ -82,6 +82,7 @@ pub contract LogisticsOrderManagement {
     fn create_new_order() {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
+        // @dev - Public function: The order_id is incremented internally.
         logistics_order_management.order_internal();
         //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
 
@@ -90,17 +91,12 @@ pub contract LogisticsOrderManagement {
         let order_quantity: u128 = 100; // Initial order quantity is set to
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
 
-        //let current_order_id: u128 = storage.order_id;
-        let current_order_id = logistics_order_management.get_order_id();
-        storage.order_quantity.at(current_order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
-        //update_order_quantity_private(storage.order_quantity, current_order_id, 100);
+        //let current_order_id = storage.order_id.read();
+        //let current_order_id = logistics_order_management.get_order_id();
+        
+        // @dev - Store the order quantity associated with the caller's address (msg_sender)
+        storage.order_quantity.at(msg_sender).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
     }
-
-    // #[external("private")]
-    // fn update_order_quantity_private(storage: Storage<PrivateContext>, order_id: u128, quantity: u128) {
-    //     storage.order_quantity.at(order_id).write(quantity);
-    // }
-
 
     /// @dev Retrieves the current order ID
     /// @return The current order ID
