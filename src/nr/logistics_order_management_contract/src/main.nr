@@ -44,12 +44,34 @@ pub contract LogisticsOrderManagement {
     impl PrivateOrderNote {
         pub fn new(owner: AztecAddress, order_id: u128, order_quantity: u128) -> Self {
             let randomness = unsafe { random() };
+
+            // @dev - Return value ("Self" is equivalent to "PrivateOrderNote" struct)
             PrivateOrderNote { 
                 owner,
                 order_id: order_id,
                 order_quantity, 
                 randomness 
             }
+        }
+
+        pub fn get_private_order_note(self) -> (AztecAddress, u128, u128, Field) {
+            (self.owner, self.order_id, self.order_quantity, self.randomness)
+        }
+
+        pub fn get_owner(self) -> AztecAddress {
+            self.owner
+        }
+
+        pub fn get_order_id(self) -> u128 {
+            self.order_id
+        }
+
+        pub fn get_order_quantity(self) -> u128 {
+            self.order_quantity
+        }
+
+        pub fn get_randomness(self) -> Field {
+            self.randomness
         }
     }
 
