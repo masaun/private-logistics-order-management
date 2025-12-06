@@ -30,22 +30,23 @@ pub contract LogisticsOrderManagement {
 
 
     // @dev - The test Struct & its Note
+    // @dev - A given "owner" will be a caller ("msg_sender"). Hence, a given "order_id" will be associated with a caller ("msg.sender").
     #[derive(Eq, Packable)]
     #[note]
     //#[custom_note]
     pub struct PrivateOrderNote {
         owner: AztecAddress,
-        //order_id: u128,
+        order_id: u128,
         order_quantity: u128,
         randomness: Field,
     }
 
     impl PrivateOrderNote {
-        pub fn new(owner: AztecAddress, order_quantity: u128) -> Self {
+        pub fn new(owner: AztecAddress, order_id: u128, order_quantity: u128) -> Self {
             let randomness = unsafe { random() };
             PrivateOrderNote { 
                 owner,
-                //order_id: current_order_id,
+                order_id: order_id,
                 order_quantity, 
                 randomness 
             }
@@ -88,7 +89,7 @@ pub contract LogisticsOrderManagement {
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
         let order_quantity: u128 = 100; // Initial order quantity is set to
-        let new_private_order_note = PrivateOrderNote::new(msg_sender, order_quantity);
+        let new_private_order_note = PrivateOrderNote::new(msg_sender, order_id, order_quantity);
 
         //let current_order_id = storage.order_id.read();
         //let current_order_id = logistics_order_management.get_order_id();
@@ -97,8 +98,8 @@ pub contract LogisticsOrderManagement {
         storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
-        logistics_order_management.order_internal();
-        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+        logistics_order_management.increment_order_id();
+        //logistics_order_management.increment_order_id().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
     }
 
     /// @dev Retrieves the current order ID
@@ -113,7 +114,7 @@ pub contract LogisticsOrderManagement {
     /// @dev - Increments the order ID
     #[external("public")] // @dev - [NOTE]: .write()/.read() methods can be used in "public" functions.
     #[internal]
-    fn order_internal() {
+    fn increment_order_id() {
         let current_order_id: u128 = storage.order_id.read();
         storage.order_id.write(current_order_id + 1);
     }
