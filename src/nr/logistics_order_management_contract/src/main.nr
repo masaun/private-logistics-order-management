@@ -97,8 +97,8 @@ pub contract LogisticsOrderManagement {
         storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
-        logistics_order_management.order_internal();
-        //logistics_order_management.order_internal().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+        logistics_order_management.increment_order_id();
+        //logistics_order_management.increment_order_id().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
     }
 
     /// @dev Retrieves the current order ID
@@ -113,7 +113,7 @@ pub contract LogisticsOrderManagement {
     /// @dev - Increments the order ID
     #[external("public")] // @dev - [NOTE]: .write()/.read() methods can be used in "public" functions.
     #[internal]
-    fn order_internal() {
+    fn increment_order_id() {
         let current_order_id: u128 = storage.order_id.read();
         storage.order_id.write(current_order_id + 1);
     }
