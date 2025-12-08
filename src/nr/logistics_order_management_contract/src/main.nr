@@ -44,12 +44,34 @@ pub contract LogisticsOrderManagement {
     impl PrivateOrderNote {
         pub fn new(owner: AztecAddress, order_id: u128, order_quantity: u128) -> Self {
             let randomness = unsafe { random() };
+
+            // @dev - Return value ("Self" is equivalent to "PrivateOrderNote" struct)
             PrivateOrderNote { 
                 owner,
                 order_id: order_id,
                 order_quantity, 
                 randomness 
             }
+        }
+
+        pub fn get_private_order_note(self) -> (AztecAddress, u128, u128, Field) {
+            (self.owner, self.order_id, self.order_quantity, self.randomness)
+        }
+
+        pub fn get_owner(self) -> AztecAddress {
+            self.owner
+        }
+
+        pub fn get_order_id(self) -> u128 {
+            self.order_id
+        }
+
+        pub fn get_order_quantity(self) -> u128 {
+            self.order_quantity
+        }
+
+        pub fn get_randomness(self) -> Field {
+            self.randomness
         }
     }
 
@@ -92,10 +114,14 @@ pub contract LogisticsOrderManagement {
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_id, order_quantity);
 
         //let current_order_id = storage.order_id.read();
-        //let current_order_id = logistics_order_management.get_order_id();
+        //let current_order_id = logistics_order_management.get_order_id().call(&mut context);
         
+        // @dev - Get an existing prvate order note of a given "order_id" -> Then, initializing the mapping storage variables
+        let existing_private_order_note = storage.order_quantity.at(order_id).get_note();
+
         // @dev - Store the order quantity associated with the caller's address (msg_sender)
-        storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+        // @dev - [Acknowledgement]: Initially, there is no existing order data (private_order_note). Hence, as long as we use the replace() method, we encounter the error message ("Assertion failed: Failed to get a note")
+        storage.order_quantity.at(order_id).replace(|_existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
         logistics_order_management.increment_order_id();

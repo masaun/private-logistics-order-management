@@ -2,9 +2,21 @@
 
 ## Overview
 
-- TBD
+- This repo is the example smart contracts using Aztec Network.
 
 <br>
+
+## Technical Stack
+
+- Smart Contract: `Noir`
+- Blockchain: `Aztec` Network (Ethereum L2 Rollup)
+
+<br>
+
+## NOTE
+
+- This repo is forked from the [aztec-workshop](https://github.com/0xShaito/aztec-workshop) repo.
+
 
 <hr>
 
