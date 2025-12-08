@@ -114,11 +114,14 @@ pub contract LogisticsOrderManagement {
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_id, order_quantity);
 
         //let current_order_id = storage.order_id.read();
-        //let current_order_id = logistics_order_management.get_order_id();
+        //let current_order_id = logistics_order_management.get_order_id().call(&mut context);
         
+        // @dev - Get an existing prvate order note of a given "order_id" -> Then, initializing the mapping storage variables
+        let existing_private_order_note = storage.order_quantity.at(order_id).get_note();
+
         // @dev - Store the order quantity associated with the caller's address (msg_sender)
         // @dev - [Acknowledgement]: Initially, there is no existing order data (private_order_note). Hence, as long as we use the replace() method, we encounter the error message ("Assertion failed: Failed to get a note")
-        storage.order_quantity.at(order_id).replace(|_old_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+        storage.order_quantity.at(order_id).replace(|_existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
         logistics_order_management.increment_order_id();
