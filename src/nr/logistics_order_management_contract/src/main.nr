@@ -105,7 +105,7 @@ pub contract LogisticsOrderManagement {
     /// @dev - Creates a new order and increments the order ID
     /// @dev - [NOTE]: a given order_id is retrieved via the get_order_id() in FE + Stored from FE. (Because the order_id is a PublicMutable variable)
     #[external("private")]
-    fn create_new_order(order_id:u128) {
+    fn create_new_order(order_id: u128) {
         let logistics_order_management = LogisticsOrderManagement::at(context.this_address());
 
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
@@ -116,16 +116,26 @@ pub contract LogisticsOrderManagement {
         //let current_order_id = storage.order_id.read();
         //let current_order_id = logistics_order_management.get_order_id().call(&mut context);
         
-        // @dev - Get an existing prvate order note of a given "order_id" -> Then, initializing the mapping storage variables
-        let existing_private_order_note = storage.order_quantity.at(order_id).get_note();
-
-        // @dev - Store the order quantity associated with the caller's address (msg_sender)
-        // @dev - [Acknowledgement]: Initially, there is no existing order data (private_order_note). Hence, as long as we use the replace() method, we encounter the error message ("Assertion failed: Failed to get a note")
-        storage.order_quantity.at(order_id).replace(|_existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+        // @dev - Store the order quantity associated with the order_id
+        // @dev - Use initialize() instead of replace() since there's no existing note for a new order
+        storage.order_quantity.at(order_id).initialize(new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
-        logistics_order_management.increment_order_id();
-        //logistics_order_management.increment_order_id().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function.
+        // @dev - enqueue() method should be used for a "public" function called inside the private function.
+        logistics_order_management.increment_order_id().enqueue(&mut context);
+    }
+
+    // @dev - Update an existing order
+    #[external("private")]
+    fn update_existing_order(order_id: u128, new_order_quantity: u128) {
+        let msg_sender: AztecAddress = context.msg_sender().unwrap();
+
+        let existing_private_order_note = storage.order_quantity.at(order_id).get_note();
+
+        let new_private_order_note = PrivateOrderNote::new(msg_sender, order_id, new_order_quantity);
+
+        // @dev - Update an existing order's quantity associated with the order_id
+        storage.order_quantity.at(order_id).replace(|existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
     }
 
     /// @dev Retrieves the current order ID
