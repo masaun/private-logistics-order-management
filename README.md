@@ -2,7 +2,14 @@
 
 ## Overview
 
-- TBD
+- This is an example project using Aztec Network.
+
+<br>
+
+## Technical Stack
+
+- Smart Contract: `Noir`
+- Blockchain: `Aztec` Network (Ethereum L2 Rollup)
 
 <br>
 
