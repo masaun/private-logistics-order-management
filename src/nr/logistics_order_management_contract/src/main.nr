@@ -117,16 +117,15 @@ pub contract LogisticsOrderManagement {
         //let current_order_id = logistics_order_management.get_order_id().call(&mut context);
         
         // @dev - Store the order quantity associated with the order_id
-        // @dev - Use initialize() instead of replace() since there's no existing note for a new order
+        // @dev - Using the initialize() instead of replace() since there's no existing note for a new order
         storage.order_quantity.at(order_id).initialize(new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
-        // @dev - enqueue() method should be used for a "public" function called inside the private function.
-        logistics_order_management.increment_order_id().enqueue(&mut context);
+        logistics_order_management.increment_order_id().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function called inside the private function.
     }
 
     // @dev - Update an existing order
-    #[external("private")]
+    #[external("private")] // @dev - [NOTE]: a "private" function will not return any value.
     fn update_existing_order(order_id: u128, new_order_quantity: u128) {
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
