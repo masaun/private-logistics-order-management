@@ -2,7 +2,7 @@
 
 ## Overview
 
-- This is an example project using Aztec Network.
+- This repo is the example smart contracts using Aztec Network.
 
 <br>
 
@@ -12,6 +12,11 @@
 - Blockchain: `Aztec` Network (Ethereum L2 Rollup)
 
 <br>
+
+## NOTE
+
+- This repo is forked from the [aztec-workshop](https://github.com/0xShaito/aztec-workshop) repo.
+
 
 <hr>
 
