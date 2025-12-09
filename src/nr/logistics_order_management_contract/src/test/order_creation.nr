@@ -13,11 +13,13 @@ use dep::aztec::oracle::debug_log::{
 };
 
 
+/**
+ * @notice - Test for the new_order_creation(), which should be successful.
+ */
 #[test]
 unconstrained fn new_order_creation_should_be_success() {
-    let (env, contract_address, owner, _) = utils::setup_contract(false);
-
-    let user_1 = env.create_light_account();
+    // @dev - Setup the test environment and deploy the contract + Create accounts (owner and user_1)
+    let (env, contract_address, owner, user_1) = utils::setup_contract(false);
 
     // @dev - Create the LogisticsOrderManagement contract instance
     let logistics_order_management = LogisticsOrderManagement::at(contract_address);
@@ -41,17 +43,23 @@ unconstrained fn new_order_creation_should_be_success() {
     //assert(order_id_after_new_order_creation as Field == 0x0000000000000000000000000000000000000000000000000000000000000001);
 }
 
+
+/**
+ * @notice - This test is almost same with above "new_order_creation_should_be_success" test.
+ * @notice - The only difference is that this test visibly deploys the contract with initializer function.
+ */
 #[test]
-unconstrained fn does_it_fail_to_call_the_initializer() {
+unconstrained fn new_order_creation_with_visible_procedure_should_be_success() {
     let mut env = aztec::test::helpers::test_environment::TestEnvironment::new();
 
+    // @dev - Create accounts (owner and user_1)
     let owner = env.create_light_account();
     let user_1 = env.create_light_account();
 
+    // @dev - Deploy / Initialize the LogisticsOrderManagement contract
     let initializer_call_interface = LogisticsOrderManagement::interface().constructor(owner);
     let logistics_order_management_deployer = env.deploy("@logistics_order_management_contract/LogisticsOrderManagement");
-    let contract_address =
-        logistics_order_management_deployer.with_public_initializer(owner, initializer_call_interface);
+    let contract_address = logistics_order_management_deployer.with_public_initializer(owner, initializer_call_interface);
 
     // @dev - Create the LogisticsOrderManagement contract instance
     let logistics_order_management = LogisticsOrderManagement::at(contract_address);
