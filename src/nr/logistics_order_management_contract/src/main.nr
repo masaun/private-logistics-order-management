@@ -89,7 +89,7 @@ pub contract LogisticsOrderManagement {
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
         order_id: PublicMutable<u128, Context>,
-        order_quantity: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
+        order_detail: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
         //order_quantity: Map<AztecAddress, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
         order_block_number: Map<u128, PrivateMutable<u32, Context>, Context>,                   /// @dev - order_id -> order_block_number (UNIX timestamp)
     }
@@ -125,7 +125,7 @@ pub contract LogisticsOrderManagement {
         
         // @dev - Store the order quantity associated with the order_id
         // @dev - Using the initialize() instead of replace() since there's no existing note for a new order
-        storage.order_quantity.at(order_id).initialize(new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
+        storage.order_detail.at(order_id).initialize(new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);    
 
         // @dev - Public function: The order_id is incremented internally.
         logistics_order_management.increment_order_id().enqueue(&mut context); // @dev - enqueue() method should be used for a "public" function called inside the private function.
@@ -136,12 +136,12 @@ pub contract LogisticsOrderManagement {
     fn update_existing_order(order_id: u128, new_order_quantity: u128, new_order_block_number: u32) {
         let msg_sender: AztecAddress = context.msg_sender().unwrap();
 
-        let existing_private_order_note = storage.order_quantity.at(order_id).get_note();
+        let existing_private_order_note = storage.order_detail.at(order_id).get_note();
 
         let new_private_order_note = PrivateOrderNote::new(msg_sender, order_id, new_order_quantity, new_order_block_number);
 
         // @dev - Update an existing order's quantity associated with the order_id
-        storage.order_quantity.at(order_id).replace(|existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
+        storage.order_detail.at(order_id).replace(|existing_private_order_note| new_private_order_note).emit(msg_sender, MessageDelivery.CONSTRAINED_ONCHAIN);
     }
 
     /// @dev Retrieves the current order ID
@@ -158,6 +158,13 @@ pub contract LogisticsOrderManagement {
     #[internal]
     fn increment_order_id() {
         let current_order_id: u128 = storage.order_id.read();
-        storage.order_id.write(current_order_id + 1);
+        storage.order_id.write(current_order_id + 1)
     }
+
+    // @dev - Retrieves the order detail of a given order_id
+    // #[external("private")]
+    // #[view]
+    // fn get_order_detail(order_id: u128) -> PrivateOrderNote {
+    //     storage.order_detail.at(order_id).get_note()
+    // }
 }
