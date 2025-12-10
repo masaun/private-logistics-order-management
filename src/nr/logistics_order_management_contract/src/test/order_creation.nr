@@ -108,8 +108,9 @@ unconstrained fn update_existing_order_should_be_success() {
     let new_order_block_number: u32 = env.next_block_number(); // New block number
     env.call_private(user_1, logistics_order_management.update_existing_order(current_order_id, new_order_quantity, new_order_block_number));
 
-    // @dev - Check whether the order_id is properly incremented or not
-    //let updated_order_quantity = env.view_private(logistics_order_management.get_order_quantity(current_order_id));
+    // @dev - [TODO]: Check whether the order_quantity is properly updated or not
+    // @dev - [HINT]: The view_notes() method is used in the nft_contract - main.nr:  https://github.com/masaun/private-logistics-management-system/pull/18#issuecomment-3629824900
+    //let updated_order_quantity = env.view_private(logistics_order_management.get_order_detail(current_order_id));
     //debug_log_format("--------- updated_order_quantity: {0} ---------", [updated_order_quantity as Field]);
     //assert(updated_order_quantity == 250);
 }

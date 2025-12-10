@@ -11,10 +11,10 @@ import {
   INITIAL_TEST_ENCRYPTION_KEYS,
 } from "@aztec/accounts/testing";
 
-describe("Counter Contract", () => {
+describe("Logistics Order Management Contract", () => {
   let wallet: TestWallet;
   let alice: AztecAddress;
-  let counter: CounterContract;
+  let logisticsOrderManagement: LogisticsOrderManagementContract;
 
   beforeAll(async () => {
     const aztecNode = await createAztecNodeClient("http://localhost:8080", {});
@@ -42,30 +42,35 @@ describe("Counter Contract", () => {
   });
 
   beforeEach(async () => {
-    counter = await deployCounter(wallet, alice);
+    logisticsOrderManagement = await deployLogisticsOrderManagement(wallet, alice);
   });
 
   it("e2e", async () => {
-    const owner = await counter.methods.get_owner().simulate({
+    const owner = await logisticsOrderManagement.methods.get_owner().simulate({
       from: alice,
     });
     expect(owner).toStrictEqual(alice);
-    // default counter's value is 0
+
+    // default order_id should be 0
     expect(
-      await counter.methods.get_counter().simulate({
+      await logisticsOrderManagement.methods.get_order_id().simulate({
         from: alice,
       }),
     ).toBe(0n);
-    // call to `increment`
-    await counter.methods
-      .increment()
+
+    // call to `create_new_order()` method
+    const order_id = await logisticsOrderManagement.methods.get_order_id().simulate({ from: alice });
+    const order_block_number = 1; // [TODO] - replace with actual block number
+    await logisticsOrderManagement.methods
+      .create_new_order(order_id, order_block_number)
       .send({
         from: alice,
       })
       .wait();
-    // now the counter should be incremented.
+    
+      // now the order_id should be incremented.
     expect(
-      await counter.methods.get_counter().simulate({
+      await logisticsOrderManagement.methods.get_order_id().simulate({
         from: alice,
       }),
     ).toBe(1n);
