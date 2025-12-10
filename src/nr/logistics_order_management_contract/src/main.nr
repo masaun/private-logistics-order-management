@@ -162,9 +162,8 @@ pub contract LogisticsOrderManagement {
     }
 
     // @dev - Retrieves the order detail of a given order_id
-    // #[external("private")]
-    // #[view]
-    // fn get_order_detail(order_id: u128) -> PrivateOrderNote {
+    // #[external("utility")]
+    // unconstrained fn get_order_detail(order_id: u128) -> pub PrivateOrderNote {
     //     storage.order_detail.at(order_id).get_note()
     // }
 }
