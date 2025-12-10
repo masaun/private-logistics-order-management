@@ -1,8 +1,8 @@
-import { CounterContract } from "../artifacts/Counter.js";
+import { LogisticsOrderManagementContract } from "../artifacts/LogisticsOrderManagement.js";
 import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { TestWallet } from "@aztec/test-wallet/server";
 import { createAztecNodeClient } from "@aztec/aztec.js/node";
-import { deployCounter } from "./utils.js";
+import { deployLogisticsOrderManagement } from "./utils.js";
 import { AztecAddress } from "@aztec/stdlib/aztec-address";
 
 import {
