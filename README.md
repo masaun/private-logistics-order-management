@@ -1,8 +1,8 @@
-# Private Logistics Management System contract on Aztec Network
+# Private Logistics Order Management contract on Aztec Network
 
 ## Overview
 
-- This repo is the private logistics (order) management system smart contract, which is written in Noir on Aztec Network
+- This repo is the private logistics order management smart contract, which is written in Noir on Aztec Network
 
 <br>
 
