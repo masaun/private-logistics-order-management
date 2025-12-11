@@ -19,7 +19,7 @@ pub contract LogisticsOrderManagement {
             traits::Packable
         },
         state_vars::{
-            PublicImmutable, PublicMutable, 
+            PublicImmutable, PublicMutable, DelayedPublicMutable,
             PrivateImmutable, PrivateMutable, PrivateSet, 
             Map
         },
@@ -88,10 +88,10 @@ pub contract LogisticsOrderManagement {
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
-        order_id: PublicMutable<u128, Context>,
+        order_id: PublicMutable<u128, Context>,  
+        //order_id: DelayedPublicMutable<u128, Context>, /// @dev - [TODO]: This "DelayedPublicMutable" type of the order_id should be tested going forward.
         order_detail: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
-        //order_quantity: Map<AztecAddress, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
-        order_block_number: Map<u128, PrivateMutable<u32, Context>, Context>,                   /// @dev - order_id -> order_block_number (UNIX timestamp)
+        order_block_number: Map<u128, PrivateMutable<u32, Context>, Context>,           /// @dev - order_id -> order_block_number (UNIX timestamp)
     }
 
     /// @dev Initialize the contract
