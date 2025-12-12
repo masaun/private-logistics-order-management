@@ -27,7 +27,16 @@ pub contract LogisticsOrderManagement {
         messages::message_delivery::MessageDelivery
     };
 
-
+    // @param owner The address of the owner
+    // @param counter A numerical value
+    #[storage]
+    struct Storage<Context> {
+        owner: PublicImmutable<AztecAddress, Context>,
+        order_id: PublicMutable<u128, Context>,  
+        //order_id: DelayedPublicMutable<u128, Context>, /// @dev - [TODO]: This "DelayedPublicMutable" type of the order_id should be tested going forward.
+        order_detail: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
+        order_block_number: Map<u128, PrivateMutable<u32, Context>, Context>,           /// @dev - order_id -> order_block_number (UNIX timestamp)
+    }
 
     // @dev - The test Struct & its Note
     // @dev - A given "owner" will be a caller ("msg_sender"). Hence, a given "order_id" will be associated with a caller ("msg.sender").
@@ -79,19 +88,6 @@ pub contract LogisticsOrderManagement {
         pub fn get_randomness(self) -> Field {
             self.randomness
         }
-    }
-
-
-
-    // @param owner The address of the owner
-    // @param counter A numerical value
-    #[storage]
-    struct Storage<Context> {
-        owner: PublicImmutable<AztecAddress, Context>,
-        order_id: PublicMutable<u128, Context>,  
-        //order_id: DelayedPublicMutable<u128, Context>, /// @dev - [TODO]: This "DelayedPublicMutable" type of the order_id should be tested going forward.
-        order_detail: Map<u128, PrivateMutable<PrivateOrderNote, Context>, Context>,    /// @dev - order_id -> order_quantity
-        order_block_number: Map<u128, PrivateMutable<u32, Context>, Context>,           /// @dev - order_id -> order_block_number (UNIX timestamp)
     }
 
     /// @dev Initialize the contract
