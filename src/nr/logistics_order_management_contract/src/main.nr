@@ -31,6 +31,13 @@ pub contract LogisticsOrderManagement {
     // @dev - Import the note and the custom note struct
     use crate::types::private_order_note::{PrivateOrderNote};
 
+    // @dev - Global variables
+    // @dev - [TODO]: Define the logistics_order_management contract instance
+    #[derive(Eq)]
+    pub struct GlobalVariables {
+        //pub logistics_order_management: LogisticsOrderManagement
+    }
+
     // @param owner The address of the owner
     // @param counter A numerical value
     #[storage]
